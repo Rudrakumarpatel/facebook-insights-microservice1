@@ -23,7 +23,7 @@ facebook-insights-microservice/
 Installation
 1. Clone the Repository
 
-git clone https://github.com/Rudrakumar/facebook-insights-microservice.git
+git clone https://github.com/Rudrakumarpatel/facebook-insights-microservice.git
 cd facebook-insights-microservice
 2. Install Dependencies
 Install all the necessary dependencies using npm:
