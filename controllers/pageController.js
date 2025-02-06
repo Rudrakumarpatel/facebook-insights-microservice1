@@ -1,5 +1,5 @@
 const scraper = require('../scraper');
-const Page = require('../models/Page');
+const Page = require('../models/Page'); // Assuming you have a Page model
 const { generateAISummary } = require('../services/aiSummary');
 
 module.exports = {
@@ -7,16 +7,32 @@ module.exports = {
         const { username } = req.params;
 
         try {
-            // Scrape the page data
             let pageData = await scraper(username);
 
-            // Ensure the data is valid (fallback to default values if necessary)
-            pageData.followers = isNaN(pageData.followers) ? 0 : pageData.followers;
-            pageData.likes = isNaN(pageData.likes) ? 0 : pageData.likes;
+            // Handle followers conversion:
+            pageData.followers = pageData.followers || '0';
+            const followerMatch = pageData.followers.match(/([\d.]+)([KM]?)/);
+            if (followerMatch) {
+                let count = parseFloat(followerMatch[1]);
+                const multiplier = followerMatch[2] === 'K' ? 1000 : followerMatch[2] === 'M' ? 1000000 : 1;
+                pageData.followers = count * multiplier;
+            } else {
+                pageData.followers = 0;
+            }
+
+            pageData.likes =  pageData.likes || '0';
+            const LikesMatch = pageData.likes.match(/([\d.]+)([KM]?)/);
+            if (LikesMatch) {
+                let count = parseFloat(LikesMatch[1]);
+                const multiplier = LikesMatch[2] === 'K' ? 1000 : LikesMatch[2] === 'M' ? 1000000 : 1;
+                pageData.likes = count * multiplier;
+            } else {
+                pageData.likes = 0;
+            }
+
             pageData.category = pageData.category || 'Unknown Category';
             pageData.followers_type = pageData.followers_type || 'Active';
 
-            // Save scraped data to MongoDB
             const page = new Page(pageData);
             await page.save();
 
@@ -39,3 +55,4 @@ module.exports = {
         }
     }
 };
+
